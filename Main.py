@@ -12,13 +12,13 @@ from keras.models import Sequential
 from keras.layers.core import Dense,Activation,Dropout
 from keras.callbacks import EarlyStopping
 from sklearn.preprocessing import OneHotEncoder
-from tensorflow.keras.optimizers import Adam
+from keras.optimizers import Adam
 from keras.utils.np_utils import to_categorical
 
 main = Tk()
-main.title("Fake Account Detection Using Machine Learning and Data Science")
+main.title("Fake Account Detection from Social Media using ANN")
 main.geometry("1300x1200")
-main.config(bg="lightgreen")
+main.config(bg="lightblue")
 
 global filename
 global X, Y
@@ -36,7 +36,7 @@ def loadProfileDataset():
     filename = filedialog.askopenfilename(initialdir="Dataset")
     outputarea.insert(END,filename+" loaded\n\n")
     dataset = pd.read_csv(filename)
-    outputarea.insert(END,str(dataset.head()))
+    outputarea.insert(END,str(dataset)+"\n")
     
 def preprocessDataset():
     global X, Y
@@ -52,9 +52,9 @@ def preprocessDataset():
     Y = to_categorical(Y)
     X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2)
 
-    outputarea.insert(END,"\n\nDataset contains total Accounts : "+str(len(X))+"\n")
-    outputarea.insert(END,"Total profiles used to train ANN algorithm : "+str(len(X_train))+"\n")
-    outputarea.insert(END,"Total profiles used to test ANN algorithm  : "+str(len(X_test))+"\n")
+    outputarea.insert(END,"\n\n  Dataset contains total Accounts : "+str(len(X))+"\n\n")
+    outputarea.insert(END,"     Total profiles used to train ANN algorithm : "+str(len(X_train))+"\n\n")
+    outputarea.insert(END,"     Total profiles used to test ANN algorithm  : "+str(len(X_test))+"\n\n")
 
 def executeANN():
     global model
@@ -77,16 +77,14 @@ def executeANN():
     accuracy = hist.history
     acc = accuracy['accuracy']
     acc = acc[199] * 100
-    outputarea.insert(END,"ANN model generated and its prediction accuracy is : "+str(acc)+"\n")
+    outputarea.insert(END,"\n\n\n       ANN model generated and its prediction accuracy is : "+str(acc)+"\n")
 
     
 def graph():
     global accuracy
     acc = accuracy['accuracy']
     loss = accuracy['loss']
-
-    
-    plt.figure(figsize=(10,6))
+    plt.figure(figsize=(10,5))
     plt.grid(True)
     plt.xlabel('Iterations')
     plt.ylabel('Accuracy/Loss')
@@ -103,8 +101,8 @@ def predictProfile():
     filename = filedialog.askopenfilename(initialdir="Dataset")
     test = pd.read_csv(filename)
     test = test.values[:, 0:8]
-    #predict = model.predict_classes(test)
-    predict = (model.predict(test) > 0.5).astype("int32")
+    predict = model.predict_classes(test)
+   # predict = (model.predict(test) > 0.5).astype("int32")
     print(predict)
     for i in range(len(test)):
         msg = ''
@@ -112,19 +110,19 @@ def predictProfile():
             msg = "Given Account Details Predicted As Genuine"
         if str(predict[i]) == '1':
             msg = "Given Account Details Predicted As Fake"
-        outputarea.insert(END,str(test[i])+" "+msg+"\n\n")    
+        outputarea.insert(END,str(test[i])+"\t"+msg+"\n\n")    
         
 def close():
     main.destroy()
 
 font = ('times', 15, 'bold')
-title = Label(main, text='Fake Account Detection Using Machine Learning and Data Science')
+title = Label(main, text='Detection of Fake Accounts from Social Media Using ANN')
 #title.config(bg='powder blue', fg='olive drab')  
 title.config(font=font)           
 title.config(height=3, width=120)       
 title.place(x=0,y=5)
 
-font1 = ('times', 13, 'bold')
+font1 = ('times', 13, 'bold','italic')
 ff = ('times', 12, 'bold')
 
 uploadButton = Button(main, text="Upload Social Network Profiles Dataset", command=loadProfileDataset)
@@ -154,10 +152,10 @@ exitButton.config(font=ff)
 
 
 font1 = ('times', 12, 'bold')
-outputarea = Text(main,height=30,width=85)
+outputarea = Text(main,height=30,width=120)
 scroll = Scrollbar(outputarea)
 outputarea.configure(yscrollcommand=scroll.set)
-outputarea.place(x=400,y=100)
+outputarea.place(x=320,y=100)
 outputarea.config(font=font1)
 
 main.config()
